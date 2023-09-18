@@ -1,8 +1,12 @@
+```mermaid
 sequenceDiagram
-particpant browser
-participant server
+    participant browser
+    participant server
 
     browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note
+
+    Note right of browser: The browser sends user input to the server
+
     activate server
     server->>browser: REDIRECT https://studies.cs.helsinki.fi/exampleapp/notes
     deactivate server
@@ -26,3 +30,4 @@ participant server
     activate server
     server-->>browser: [{ "content": "Look, a note!", "date": "2023-18-9" }, ... ]
     deactivate server
+```
