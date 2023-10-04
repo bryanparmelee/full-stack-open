@@ -1,16 +1,11 @@
-require("dotenv").config();
-const express = require("express");
-const app = express();
-const cors = require("cors");
-
-app.use(cors());
-app.use(express.json());
+const app = require("./app");
+const logger = require("./utils/logger");
+const config = require("./utils/config");
 
 app.get("/", (req, res) => {
   res.send("<h1>Hello world</h1>");
 });
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(config.PORT, () => {
+  logger.info(`Server running on port ${config.PORT}`);
 });
