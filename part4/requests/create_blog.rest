@@ -1,8 +1,9 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIyIiwiaWQiOiI2NTJkYWFmOTIyNzhhMmI1NDFlYzQzODgiLCJpYXQiOjE2OTc3NzE4MTYsImV4cCI6MTY5Nzc3NTQxNn0.-YI4T7d3Dpa4mWWHfKodhHirXJUDcpX8EbH4XHd_-KM
 
 {
-    "title": "11 Best states",
-    "author": "Bob Hope",
-    "url": "https://fullstackopen.com/en/part4/structure_of_backend_application_introduction_to_testing#exercises-4-1-4-2"
+    "title": "Diving for dolphins",
+    "author": "Henrick Valuer",
+    "url": "https://cats.com/"
 }
