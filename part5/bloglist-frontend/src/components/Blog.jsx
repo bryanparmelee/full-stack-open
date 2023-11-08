@@ -1,11 +1,10 @@
 import { useState } from "react";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog, deleteBlog }) => {
+const Blog = ({ blog, deleteBlog, handleLike }) => {
   const [visible, setIsVisible] = useState(false);
-  const [likes, setLikes] = useState(blog.likes);
 
-  const { title, author, url, user } = blog;
+  const { title, author, url, user, likes } = blog;
 
   const loggedInUser = JSON.parse(
     window.localStorage.getItem("loggedBlogAppUser")
@@ -13,17 +12,6 @@ const Blog = ({ blog, deleteBlog }) => {
 
   const toggleVisibility = () => {
     setIsVisible(!visible);
-  };
-
-  const handleLike = () => {
-    const blogToUpdate = {
-      ...blog,
-      likes: likes + 1,
-    };
-
-    blogService
-      .update(blogToUpdate)
-      .then((updatedBlog) => setLikes(updatedBlog.likes));
   };
 
   const blogStyles = {

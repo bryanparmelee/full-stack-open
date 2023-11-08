@@ -6,6 +6,7 @@ import loginService from "./services/login";
 import Notifcation from "./components/Notifcation";
 import Toggleable from "./components/Toggleable";
 import BlogForm from "./components/BlogForm";
+import LoginForm from "./components/LoginForm";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -16,7 +17,9 @@ const App = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    blogService
+      .getAll()
+      .then((blogs) => setBlogs(blogs.sort((a, b) => b.likes - a.likes)));
   }, []);
 
   useEffect(() => {
@@ -67,6 +70,29 @@ const App = () => {
     });
   };
 
+  const handleLike = (id) => {
+    const blogToUpdate = blogs.find((b) => b.id === id);
+
+    const updateBlog = {
+      ...blogToUpdate,
+      likes: blogToUpdate.likes + 1,
+    };
+
+    blogService
+      .update(updateBlog)
+      .then((returnedBlog) => {
+        setBlogs(blogs.map((blog) => (blog.id !== id ? blog : returnedBlog)));
+      })
+      .catch((error) => {
+        setErrorMessage(
+          `Blog ${blogToUpdate.title} was already removed from server`
+        );
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      });
+  };
+
   const deleteBlog = (blogObject) => {
     if (
       window.confirm(`Remove blog ${blogObject.title} by ${blogObject.author}?`)
@@ -86,40 +112,8 @@ const App = () => {
     setUser(null);
   };
 
-  const loginForm = () => (
-    <>
-      <h2>Log in</h2>
-      {errorMessage && <Notifcation message={errorMessage} type="error" />}
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUserName(target.value)}
-          />
-        </div>
-        <div>
-          password
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-    </>
-  );
-
   const blogsList = () => (
     <>
-      <h2>blogs</h2>
-      {notification && (
-        <Notifcation message={notification} type="notification" />
-      )}
       <div>
         {`${user.name} logged in`}
         <button type="button" onClick={handleSignout}>
@@ -129,15 +123,37 @@ const App = () => {
       <Toggleable buttonLabel="New Blog" ref={blogFormRef}>
         <BlogForm createBlog={createBlog} />
       </Toggleable>
-      {blogs
-        .sort((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog key={blog.id} blog={blog} deleteBlog={deleteBlog} />
-        ))}
+      {blogs.map((blog) => (
+        <Blog
+          key={blog.id}
+          blog={blog}
+          deleteBlog={deleteBlog}
+          handleLike={() => handleLike(blog.id)}
+        />
+      ))}
     </>
   );
 
-  return <div>{user ? blogsList() : loginForm()}</div>;
+  return (
+    <div>
+      <h2>Blogs</h2>
+      {notification && (
+        <Notifcation message={notification} type="notification" />
+      )}
+      {errorMessage && <Notifcation message={errorMessage} type="error" />}
+      {user ? (
+        blogsList()
+      ) : (
+        <LoginForm
+          handleLogin={handleLogin}
+          username={username}
+          password={password}
+          handleUsernameChange={({ target }) => setUserName(target.value)}
+          handlePasswordChange={({ target }) => setPassword(target.value)}
+        />
+      )}
+    </div>
+  );
 };
 
 export default App;
