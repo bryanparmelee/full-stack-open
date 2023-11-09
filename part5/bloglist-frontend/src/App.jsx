@@ -59,15 +59,23 @@ const App = () => {
   const createBlog = (blogObject) => {
     blogFormRef.current.toggleVisibility();
 
-    blogService.create(blogObject).then((newBlog) => {
-      setBlogs(blogs.concat({ ...newBlog, user: user }));
-      setNotification(
-        `a new blog ${newBlog.title} by ${newBlog.author} has been added`
-      );
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
-    });
+    blogService
+      .create(blogObject)
+      .then((newBlog) => {
+        setBlogs(blogs.concat({ ...newBlog, user: user }));
+        setNotification(
+          `a new blog ${newBlog.title} by ${newBlog.author} has been added`
+        );
+        setTimeout(() => {
+          setNotification(null);
+        }, 5000);
+      })
+      .catch((error) => {
+        setErrorMessage(`Failed to create new blog.`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      });
   };
 
   const handleLike = (id) => {
