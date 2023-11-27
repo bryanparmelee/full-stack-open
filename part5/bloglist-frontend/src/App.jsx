@@ -7,14 +7,17 @@ import Notifcation from "./components/Notifcation";
 import Toggleable from "./components/Toggleable";
 import BlogForm from "./components/BlogForm";
 import LoginForm from "./components/LoginForm";
+import { useDispatch } from "react-redux";
+
+import { setNotification } from "./reducers/notificationReducer";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [notification, setNotification] = useState(null);
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     blogService
@@ -49,10 +52,12 @@ const App = () => {
       setUserName("");
       setPassword("");
     } catch (exception) {
-      setErrorMessage("Incorrect username or password");
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      dispatch(
+        setNotification(
+          { message: "Incorrect username or password", type: "error" },
+          5
+        )
+      );
     }
   };
 
@@ -63,18 +68,23 @@ const App = () => {
       .create(blogObject)
       .then((newBlog) => {
         setBlogs(blogs.concat({ ...newBlog, user: user }));
-        setNotification(
-          `a new blog ${newBlog.title} by ${newBlog.author} has been added`
+        dispatch(
+          setNotification(
+            {
+              message: `a new blog "${newBlog.title}" by ${newBlog.author} has been added`,
+              type: "notification",
+            },
+            5
+          )
         );
-        setTimeout(() => {
-          setNotification(null);
-        }, 5000);
       })
       .catch((error) => {
-        setErrorMessage(`Failed to create new blog.`);
-        setTimeout(() => {
-          setErrorMessage(null);
-        }, 5000);
+        dispatch(
+          setNotification(
+            { message: "Failed to create new blog.", type: "error" },
+            5
+          )
+        );
       });
   };
 
@@ -94,14 +104,26 @@ const App = () => {
             .map((blog) => (blog.id !== id ? blog : returnedBlog))
             .sort((a, b) => b.likes - a.likes)
         );
+        dispatch(
+          setNotification(
+            {
+              message: `You liked "${returnedBlog.title}" by ${returnedBlog.author}`,
+              type: "notification",
+            },
+            5
+          )
+        );
       })
       .catch((error) => {
-        setErrorMessage(
-          `Blog ${blogToUpdate.title} was already removed from server`
+        dispatch(
+          setNotification(
+            {
+              message: `Blog "${blogToUpdate.title}" was already removed from server`,
+              type: "error",
+            },
+            5
+          )
         );
-        setTimeout(() => {
-          setErrorMessage(null);
-        }, 5000);
       });
   };
 
@@ -111,10 +133,9 @@ const App = () => {
     ) {
       blogService.remove(blogObject).then(() => {
         setBlogs(blogs.filter((blog) => blog.id !== blogObject.id));
-        setNotification("Blog removed");
-        setTimeout(() => {
-          setNotification(null);
-        }, 5000);
+        dispatch(
+          setNotification({ message: "Blog removed", type: "notification" }, 5)
+        );
       });
     }
   };
@@ -149,10 +170,7 @@ const App = () => {
   return (
     <div>
       <h2>Blogs</h2>
-      {notification && (
-        <Notifcation message={notification} type="notification" />
-      )}
-      {errorMessage && <Notifcation message={errorMessage} type="error" />}
+      <Notifcation />
       {user ? (
         blogsList()
       ) : (
