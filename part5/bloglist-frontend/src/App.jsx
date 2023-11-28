@@ -8,21 +8,22 @@ import Toggleable from "./components/Toggleable";
 import BlogForm from "./components/BlogForm";
 import LoginForm from "./components/LoginForm";
 import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { setNotification } from "./reducers/notificationReducer";
+import { initializeBlogs } from "./reducers/blogReducer";
+import BlogList from "./components/BlogList";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
+  const dispatch = useDispatch();
+
+  // const [blogs, setBlogs] = useState([]);
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
 
-  const dispatch = useDispatch();
-
   useEffect(() => {
-    blogService
-      .getAll()
-      .then((blogs) => setBlogs(blogs.sort((a, b) => b.likes - a.likes)));
+    dispatch(initializeBlogs());
   }, []);
 
   useEffect(() => {
@@ -33,6 +34,8 @@ const App = () => {
       blogService.setToken(user.token);
     }
   }, []);
+
+  // const blogs = useSelector((state) => state.blogs);
 
   const blogFormRef = useRef();
 
@@ -67,7 +70,7 @@ const App = () => {
     blogService
       .create(blogObject)
       .then((newBlog) => {
-        setBlogs(blogs.concat({ ...newBlog, user: user }));
+        // setBlogs(blogs.concat({ ...newBlog, user: user }));
         dispatch(
           setNotification(
             {
@@ -99,11 +102,11 @@ const App = () => {
     blogService
       .update(updateBlog)
       .then((returnedBlog) => {
-        setBlogs(
-          blogs
-            .map((blog) => (blog.id !== id ? blog : returnedBlog))
-            .sort((a, b) => b.likes - a.likes)
-        );
+        // setBlogs(
+        //   blogs
+        //     .map((blog) => (blog.id !== id ? blog : returnedBlog))
+        //     .sort((a, b) => b.likes - a.likes)
+        // );
         dispatch(
           setNotification(
             {
@@ -132,7 +135,7 @@ const App = () => {
       window.confirm(`Remove blog ${blogObject.title} by ${blogObject.author}?`)
     ) {
       blogService.remove(blogObject).then(() => {
-        setBlogs(blogs.filter((blog) => blog.id !== blogObject.id));
+        // setBlogs(blogs.filter((blog) => blog.id !== blogObject.id));
         dispatch(
           setNotification({ message: "Blog removed", type: "notification" }, 5)
         );
@@ -145,34 +148,21 @@ const App = () => {
     setUser(null);
   };
 
-  const blogsList = () => (
-    <>
-      <div>
-        {`${user.name} logged in`}
-        <button type="button" onClick={handleSignout}>
-          Sign Out
-        </button>
-      </div>
-      <Toggleable buttonLabel="New Blog" ref={blogFormRef}>
-        <BlogForm createBlog={createBlog} />
-      </Toggleable>
-      {blogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          deleteBlog={deleteBlog}
-          handleLike={() => handleLike(blog.id)}
-        />
-      ))}
-    </>
-  );
-
   return (
     <div>
       <h2>Blogs</h2>
       <Notifcation />
       {user ? (
-        blogsList()
+        <>
+          {`${user.name} logged in`}
+          <button type="button" onClick={handleSignout}>
+            Sign Out
+          </button>
+          <Toggleable buttonLabel="New Blog" ref={blogFormRef}>
+            <BlogForm />
+          </Toggleable>
+          <BlogList />
+        </>
       ) : (
         <LoginForm
           handleLogin={handleLogin}
