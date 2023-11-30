@@ -36,7 +36,20 @@ const remove = async (blogObject) => {
   };
   const url = `${baseUrl}/${blogObject.id}`;
   const response = await axios.delete(url, config);
+  return response;
+};
+
+const like = async (blogObject) => {
+  const config = {
+    headers: { Authorization: token },
+  };
+  const likedBlog = {
+    ...blogObject,
+    likes: blogObject.likes + 1,
+  };
+  const url = `${baseUrl}/${blogObject.id}`;
+  const response = await axios.put(url, likedBlog, config);
   return response.data;
 };
 
-export default { setToken, getAll, create, update, remove };
+export default { setToken, getAll, create, update, remove, like };

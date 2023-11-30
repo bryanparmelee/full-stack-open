@@ -1,10 +1,14 @@
 import { useState } from "react";
-import blogService from "../services/blogs";
+import { useDispatch } from "react-redux";
+import { deleteBlog, likeBlog } from "../reducers/blogReducer";
+import { setNotification } from "../reducers/notificationReducer";
 
-const Blog = ({ blog, deleteBlog, handleLike }) => {
+const Blog = ({ blog }) => {
   const [visible, setIsVisible] = useState(false);
 
-  const { title, author, url, user, likes } = blog;
+  const disptach = useDispatch();
+
+  const { title, author, url, likes, user } = blog;
 
   const loggedInUser = JSON.parse(
     window.localStorage.getItem("loggedBlogAppUser")
@@ -12,6 +16,31 @@ const Blog = ({ blog, deleteBlog, handleLike }) => {
 
   const toggleVisibility = () => {
     setIsVisible(!visible);
+  };
+
+  const handleLike = () => {
+    disptach(likeBlog(blog));
+    disptach(
+      setNotification(
+        { message: `You liked "${blog.title}"`, type: "notification" },
+        5
+      )
+    );
+  };
+
+  const handleRemove = () => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+      disptach(deleteBlog(blog));
+      disptach(
+        setNotification(
+          {
+            message: "Blog removed",
+            type: "notification",
+          },
+          5
+        )
+      );
+    }
   };
 
   const blogStyles = {
@@ -35,7 +64,7 @@ const Blog = ({ blog, deleteBlog, handleLike }) => {
           {user && user.username}
           <br />
           {loggedInUser && loggedInUser.username === user.username && (
-            <button onClick={() => deleteBlog(blog)}>Remove</button>
+            <button onClick={handleRemove}>Remove</button>
           )}
         </div>
       )}
