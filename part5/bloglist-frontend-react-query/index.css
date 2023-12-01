@@ -17,9 +17,3 @@
   padding: 10px;
   margin-bottom: 10px;
 }
-
-.navbar {
-  background-color: rgb(149, 149, 149);
-  display: flex;
-  gap: 8px;
-}

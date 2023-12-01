@@ -54,9 +54,7 @@ const App = () => {
             }, 5000);
           })
           .catch((error) => {
-            setError(
-              `${existingPerson.name} has already been removed from server.`
-            );
+            setError(error.response.data.error);
           });
         setTimeout(() => {
           setError("");
@@ -67,15 +65,23 @@ const App = () => {
         name: newName,
         number: newNumber,
       };
-      personService.create(personObject).then((res) => {
-        setPersons(persons.concat(res.data));
-        setNotification(`${res.data.name} has been added.`);
-        setNewName("");
-        setNewNumber("");
-        setTimeout(() => {
-          setNotification("");
-        }, 5000);
-      });
+      personService
+        .create(personObject)
+        .then((res) => {
+          setPersons(persons.concat(res.data));
+          setNotification(`${res.data.name} has been added.`);
+          setNewName("");
+          setNewNumber("");
+          setTimeout(() => {
+            setNotification("");
+          }, 5000);
+        })
+        .catch((error) => {
+          setError(error.response.data.error);
+        });
+      setTimeout(() => {
+        setError("");
+      }, 5000);
     }
   };
 
@@ -84,6 +90,10 @@ const App = () => {
     if (window.confirm(`Do you really want to delete ${toDelete.name}?`)) {
       personService.deletePerson(id);
       setPersons(persons.filter((p) => p.id !== id));
+      setNotification(`${toDelete.name} has been removed`);
+      setTimeout(() => {
+        setNotification("");
+      }, 5000);
     }
   };
 

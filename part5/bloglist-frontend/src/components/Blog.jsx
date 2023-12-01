@@ -1,22 +1,23 @@
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { deleteBlog, likeBlog } from "../reducers/blogReducer";
 import { setNotification } from "../reducers/notificationReducer";
+import { Link, useParams } from "react-router-dom";
 
-const Blog = ({ blog }) => {
-  const [visible, setIsVisible] = useState(false);
-
+const Blog = () => {
   const disptach = useDispatch();
+
+  const { id } = useParams();
+
+  const blogs = useSelector((state) => state.blogs);
+  const blog = blogs.find((blog) => blog.id === id);
+
+  if (!blog) return null;
 
   const { title, author, url, likes, user } = blog;
 
   const loggedInUser = JSON.parse(
     window.localStorage.getItem("loggedBlogAppUser")
   );
-
-  const toggleVisibility = () => {
-    setIsVisible(!visible);
-  };
 
   const handleLike = () => {
     disptach(likeBlog(blog));
@@ -43,30 +44,17 @@ const Blog = ({ blog }) => {
     }
   };
 
-  const blogStyles = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-
   return (
-    <div style={blogStyles} className="blog">
-      {title} {author}
-      <button onClick={toggleVisibility}>{visible ? "hide" : "view"}</button>
-      {visible && (
-        <div className="details">
-          {url && url}
-          <br />
-          Likes {likes && likes} <button onClick={handleLike}>Like</button>
-          <br />
-          {user && user.username}
-          <br />
-          {loggedInUser && loggedInUser.username === user.username && (
-            <button onClick={handleRemove}>Remove</button>
-          )}
-        </div>
+    <div className="blog">
+      <h2> {`${title} by ${author}`}</h2>
+      <Link to={`${url}`}>{url}</Link>
+      <br />
+      {likes && likes} Likes <button onClick={handleLike}>Like</button>
+      <br />
+      Added by {user && user.username}
+      <br />
+      {loggedInUser && loggedInUser.username === user.username && (
+        <button onClick={handleRemove}>Remove</button>
       )}
     </div>
   );
