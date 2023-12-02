@@ -13,7 +13,7 @@ const Blog = () => {
 
   if (!blog) return null;
 
-  const { title, author, url, likes, user } = blog;
+  const { title, author, url, likes, user, comments } = blog;
 
   const loggedInUser = JSON.parse(
     window.localStorage.getItem("loggedBlogAppUser")
@@ -55,6 +55,16 @@ const Blog = () => {
       <br />
       {loggedInUser && loggedInUser.username === user.username && (
         <button onClick={handleRemove}>Remove</button>
+      )}
+      {comments.length > 0 && (
+        <>
+          <h3>comments</h3>
+          <ul>
+            {comments.map((comment) => (
+              <li key={comment.id}>{comment.content}</li>
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );
