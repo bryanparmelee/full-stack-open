@@ -80,13 +80,15 @@ blogsRouter.put("/:id", userExtractor, async (req, res) => {
 
   const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, blog, {
     new: true,
-  }).populate("user");
+  })
+    .populate("user")
+    .populate("comments");
   res.json(updatedBlog);
 });
 
 blogsRouter.post("/:id/comments", async (req, res) => {
   const body = req.body;
-  const blog = await Blog.findById(req.params.id);
+  const blog = await Blog.findById(req.params.id).populate("comments");
 
   const comment = new Comment({
     content: body.content,
@@ -94,9 +96,8 @@ blogsRouter.post("/:id/comments", async (req, res) => {
   });
 
   const savedComment = await comment.save();
-  blog.comments = blog.comments.concat(comment);
-  await blog.save();
-  const blogWithComment = blog.populate("comments");
+  blog.comments = blog.comments.concat(savedComment);
+  const blogWithComment = await blog.save();
   res.status(201).json(blogWithComment);
 });
 

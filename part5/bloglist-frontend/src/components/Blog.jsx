@@ -3,6 +3,8 @@ import { deleteBlog, likeBlog } from "../reducers/blogReducer";
 import { setNotification } from "../reducers/notificationReducer";
 import { Link, useParams } from "react-router-dom";
 
+import CommentList from "./CommentList";
+
 const Blog = () => {
   const disptach = useDispatch();
 
@@ -13,7 +15,7 @@ const Blog = () => {
 
   if (!blog) return null;
 
-  const { title, author, url, likes, user, comments } = blog;
+  const { title, author, url, likes, user } = blog;
 
   const loggedInUser = JSON.parse(
     window.localStorage.getItem("loggedBlogAppUser")
@@ -56,16 +58,7 @@ const Blog = () => {
       {loggedInUser && loggedInUser.username === user.username && (
         <button onClick={handleRemove}>Remove</button>
       )}
-      {comments.length > 0 && (
-        <>
-          <h3>comments</h3>
-          <ul>
-            {comments.map((comment) => (
-              <li key={comment.id}>{comment.content}</li>
-            ))}
-          </ul>
-        </>
-      )}
+      <CommentList blog={blog} />
     </div>
   );
 };
