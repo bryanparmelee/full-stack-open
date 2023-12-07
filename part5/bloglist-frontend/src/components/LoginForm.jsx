@@ -3,6 +3,8 @@ import { useDispatch } from "react-redux";
 
 import { loginUser } from "../reducers/authReducer";
 
+import { Box, Typography, TextField, Button } from "@mui/material";
+
 const LoginForm = () => {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
@@ -18,36 +20,40 @@ const LoginForm = () => {
   };
 
   return (
-    <>
-      <h2>Log in</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input
-            id="username"
-            type="text"
-            value={username}
-            name="Username"
-            autoComplete="username"
-            onChange={({ target }) => setUserName(target.value)}
-          />
-        </div>
-        <div>
-          password
-          <input
-            id="password"
-            type="password"
-            value={password}
-            name="Password"
-            autoComplete="current-password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button id="login-button" type="submit">
-          Login
-        </button>
-      </form>
-    </>
+    <Box
+      component="form"
+      onSubmit={handleLogin}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        width: 200,
+      }}
+    >
+      <Typography variant="h4">Log in</Typography>
+
+      <TextField
+        size="small"
+        label="username"
+        value={username}
+        name="Username"
+        autoComplete="username"
+        onChange={({ target }) => setUserName(target.value)}
+      />
+
+      <TextField
+        size="small"
+        label="password"
+        value={password}
+        name="Title"
+        placeholder="Title"
+        onChange={({ target }) => setPassword(target.value)}
+      />
+
+      <Button variant="contained" type="submit">
+        Login
+      </Button>
+    </Box>
   );
 };
 

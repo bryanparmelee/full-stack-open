@@ -1,19 +1,29 @@
 import CommentForm from "./CommentForm";
 
+import { Box, List, ListItem, ListItemText, Typography } from "@mui/material";
+
 const CommentList = ({ blog }) => {
   const { comments, id } = blog;
   return (
-    <>
-      <h3>comments</h3>
-      <CommentForm blogId={id} />
-      {comments.length > 0 && (
-        <ul>
-          {comments.map((comment) => (
-            <li key={comment.id}>{comment.content}</li>
-          ))}
-        </ul>
-      )}
-    </>
+    <Box
+      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
+      <Typography variant="h5">Comments</Typography>
+      <Box>
+        <CommentForm blogId={id} />
+      </Box>
+      <Box>
+        {comments.length > 0 && (
+          <List>
+            {comments.map((comment) => (
+              <ListItem key={comment.id}>
+                <ListItemText primary={`${comment.content}`} />
+              </ListItem>
+            ))}
+          </List>
+        )}
+      </Box>
+    </Box>
   );
 };
 

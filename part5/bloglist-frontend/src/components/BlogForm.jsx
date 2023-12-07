@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { createBlog } from "../reducers/blogReducer";
 import { setNotification } from "../reducers/notificationReducer";
+import { Box, Button, Container, TextField, Typography } from "@mui/material";
 
 const BlogForm = () => {
   const [title, setTitle] = useState("");
@@ -27,7 +28,7 @@ const BlogForm = () => {
       setNotification(
         {
           message: `A new blog "${newBlog.title}" by ${newBlog.author} has been created`,
-          type: "notification",
+          type: "success",
         },
         5
       )
@@ -35,45 +36,59 @@ const BlogForm = () => {
   };
 
   return (
-    <>
-      <h2>Create new</h2>
-      <form onSubmit={createNewBlog}>
-        <div>
-          title:
-          <input
+    <Container maxWidth="md">
+      <Typography variant="h4">Create new</Typography>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Box
+          component="form"
+          onSubmit={createNewBlog}
+          sx={{ display: "flex", flexDirection: "column", gap: 2, width: 200 }}
+        >
+          <TextField
+            size="small"
+            label="title"
             id="title"
-            type="text"
             value={title}
             name="Title"
             placeholder="Title"
             onChange={({ target }) => setTitle(target.value)}
           />
-        </div>
-        <div>
-          author:
-          <input
+          <TextField
+            size="small"
+            label="author"
             id="author"
-            type="text"
             value={author}
             name="Author"
             placeholder="Author"
             onChange={({ target }) => setAuthor(target.value)}
           />
-        </div>
-        <div>
-          url:
-          <input
+
+          <TextField
+            size="small"
+            label="url"
             id="url"
-            type="text"
             value={url}
             name="Url"
             placeholder="url"
             onChange={({ target }) => setUrl(target.value)}
           />
-        </div>
-        <button type="submit">Create blog</button>
-      </form>
-    </>
+
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            size="small"
+          >
+            Create blog
+          </Button>
+        </Box>
+      </Box>
+    </Container>
   );
 };
 

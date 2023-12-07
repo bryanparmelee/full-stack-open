@@ -2,6 +2,14 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { Routes, Route, Link } from "react-router-dom";
+import {
+  AppBar,
+  Container,
+  Toolbar,
+  Button,
+  Typography,
+  Box,
+} from "@mui/material";
 
 import blogService from "./services/blogs";
 
@@ -39,28 +47,47 @@ const App = () => {
   };
 
   return (
-    <div className="app">
+    <Container>
       {currentUser && (
-        <div className="navbar">
-          <Link to="/blogs">blogs</Link>
-          <Link to="/users">users</Link>
-          {`${currentUser.name} logged in`}
-          <button type="button" onClick={handleSignout}>
-            Sign Out
-          </button>
-        </div>
+        <AppBar position="static">
+          <Toolbar sx={{ justifyContent: "space-around" }}>
+            <Button color="inherit" component={Link} to="/blogs">
+              Blogs
+            </Button>
+            <Button color="inherit" component={Link} to="/users">
+              Users
+            </Button>
+
+            <Button color="inherit" onClick={handleSignout}>
+              Sign Out
+            </Button>
+            <Typography>{`${currentUser.name} logged in`}</Typography>
+          </Toolbar>
+        </AppBar>
       )}
       <Notifcation />
-      <h2>blog app</h2>
-      <Routes>
-        <Route path="/" element={currentUser ? <BlogList /> : <LoginForm />} />
-        <Route path="/blogs" element={<BlogList />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/blogs/:id" element={<Blog />} />
-        <Route path="/users/:id" element={<User />} />
-        <Route path="/users" element={<UserList />} />
-      </Routes>
-    </div>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 4,
+        }}
+      >
+        <Typography variant="h2">blog app</Typography>
+        <Routes>
+          <Route
+            path="/"
+            element={currentUser ? <BlogList /> : <LoginForm />}
+          />
+          <Route path="/blogs" element={<BlogList />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/blogs/:id" element={<Blog />} />
+          <Route path="/users/:id" element={<User />} />
+          <Route path="/users" element={<UserList />} />
+        </Routes>
+      </Box>
+    </Container>
   );
 };
 

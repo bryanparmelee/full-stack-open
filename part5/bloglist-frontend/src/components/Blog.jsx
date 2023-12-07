@@ -1,12 +1,17 @@
 import { useDispatch, useSelector } from "react-redux";
 import { deleteBlog, likeBlog } from "../reducers/blogReducer";
 import { setNotification } from "../reducers/notificationReducer";
-import { Link, useParams } from "react-router-dom";
+import { Link as RouterLink, useParams, useNavigate } from "react-router-dom";
+import { Link, Button, Typography, Box } from "@mui/material";
+
+import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import CommentList from "./CommentList";
 
 const Blog = () => {
   const disptach = useDispatch();
+  const navigate = useNavigate();
 
   const { id } = useParams();
 
@@ -25,7 +30,7 @@ const Blog = () => {
     disptach(likeBlog(blog));
     disptach(
       setNotification(
-        { message: `You liked "${blog.title}"`, type: "notification" },
+        { message: `You liked "${blog.title}"`, type: "success" },
         5
       )
     );
@@ -38,28 +43,71 @@ const Blog = () => {
         setNotification(
           {
             message: "Blog removed",
-            type: "notification",
+            type: "success",
           },
           5
         )
       );
     }
+    navigate("/blogs");
   };
 
   return (
-    <div className="blog">
-      <h2> {`${title} by ${author}`}</h2>
-      <Link to={`${url}`}>{url}</Link>
-      <br />
-      {likes && likes} Likes <button onClick={handleLike}>Like</button>
-      <br />
-      Added by {user && user.username}
-      <br />
-      {loggedInUser && loggedInUser.username === user.username && (
-        <button onClick={handleRemove}>Remove</button>
-      )}
-      <CommentList blog={blog} />
-    </div>
+    <>
+      <Box
+        sx={{
+          width: 345,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 2,
+          border: 4,
+          borderColor: "primary.main",
+          padding: 2,
+        }}
+      >
+        <Typography variant="h5"> {`${title} by ${author}`}</Typography>
+        <Typography>
+          <Link
+            color="inherit"
+            underline="none"
+            component={RouterLink}
+            to={`${url}`}
+          >
+            {url}
+          </Link>
+        </Typography>
+        {likes && likes} Likes{" "}
+        <Button
+          variant="contained"
+          startIcon={<ThumbUpOffAltIcon />}
+          onClick={handleLike}
+        >
+          Like
+        </Button>
+        <Typography>
+          Added by{" "}
+          <Link color="inherit" component={RouterLink} to={`/users/${user.id}`}>
+            {user && user.username}
+          </Link>
+        </Typography>
+        {loggedInUser && loggedInUser.username === user.username && (
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleRemove}
+            startIcon={<DeleteIcon />}
+          >
+            Delete
+          </Button>
+        )}
+      </Box>
+
+      <Box>
+        <CommentList blog={blog} />
+      </Box>
+    </>
   );
 };
 
