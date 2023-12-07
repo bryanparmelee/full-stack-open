@@ -1,94 +1,63 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { createBlog } from "../reducers/blogReducer";
-import { setNotification } from "../reducers/notificationReducer";
-import { Box, Button, Container, TextField, Typography } from "@mui/material";
 
-const BlogForm = () => {
+const BlogForm = ({ createBlog }) => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
 
-  const dispatch = useDispatch();
-
-  const createNewBlog = (e) => {
+  const addBlog = (e) => {
     e.preventDefault();
 
-    const newBlog = {
+    createBlog({
       title: title,
       author: author,
       url: url,
-      likes: 0,
-    };
+    });
     setTitle("");
     setAuthor("");
     setUrl("");
-    dispatch(createBlog(newBlog));
-    dispatch(
-      setNotification(
-        {
-          message: `A new blog "${newBlog.title}" by ${newBlog.author} has been created`,
-          type: "success",
-        },
-        5
-      )
-    );
   };
 
   return (
-    <Container maxWidth="md">
-      <Typography variant="h4">Create new</Typography>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <Box
-          component="form"
-          onSubmit={createNewBlog}
-          sx={{ display: "flex", flexDirection: "column", gap: 2, width: 200 }}
-        >
-          <TextField
-            size="small"
-            label="title"
+    <>
+      <h2>Create new</h2>
+      <form onSubmit={addBlog}>
+        <div>
+          title:
+          <input
             id="title"
+            type="text"
             value={title}
             name="Title"
             placeholder="Title"
             onChange={({ target }) => setTitle(target.value)}
           />
-          <TextField
-            size="small"
-            label="author"
+        </div>
+        <div>
+          author:
+          <input
             id="author"
+            type="text"
             value={author}
             name="Author"
             placeholder="Author"
             onChange={({ target }) => setAuthor(target.value)}
           />
-
-          <TextField
-            size="small"
-            label="url"
+        </div>
+        <div>
+          url:
+          <input
             id="url"
+            type="text"
             value={url}
             name="Url"
             placeholder="url"
             onChange={({ target }) => setUrl(target.value)}
           />
-
-          <Button
-            variant="contained"
-            color="primary"
-            type="submit"
-            size="small"
-          >
-            Create blog
-          </Button>
-        </Box>
-      </Box>
-    </Container>
+        </div>
+        <button type="submit">Create blog</button>
+      </form>
+    </>
   );
 };
 

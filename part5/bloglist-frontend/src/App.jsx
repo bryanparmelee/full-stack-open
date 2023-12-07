@@ -1,93 +1,170 @@
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
-import { Routes, Route, Link } from "react-router-dom";
-import {
-  AppBar,
-  Container,
-  Toolbar,
-  Button,
-  Typography,
-  Box,
-} from "@mui/material";
-
+import { useState, useEffect, useRef } from "react";
+import Blog from "./components/Blog";
 import blogService from "./services/blogs";
-
-import { initializeBlogs } from "./reducers/blogReducer";
-import { setAuth } from "./reducers/authReducer";
-import { logoutUser } from "./reducers/authReducer";
+import loginService from "./services/login";
 
 import Notifcation from "./components/Notifcation";
-import BlogList from "./components/BlogList";
+import Toggleable from "./components/Toggleable";
+import BlogForm from "./components/BlogForm";
 import LoginForm from "./components/LoginForm";
-import UserList from "./components/UserList";
-import User from "./components/User";
-import Blog from "./components/Blog";
 
 const App = () => {
-  const dispatch = useDispatch();
+  const [blogs, setBlogs] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [notification, setNotification] = useState(null);
+  const [username, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    dispatch(initializeBlogs());
+    blogService
+      .getAll()
+      .then((blogs) => setBlogs(blogs.sort((a, b) => b.likes - a.likes)));
   }, []);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
     if (loggedUserJSON) {
-      const loggedUser = JSON.parse(loggedUserJSON);
-      dispatch(setAuth(loggedUser));
-      blogService.setToken(loggedUser.token);
+      const user = JSON.parse(loggedUserJSON);
+      setUser(user);
+      blogService.setToken(user.token);
     }
   }, []);
 
-  const currentUser = useSelector((state) => state.auth);
+  const blogFormRef = useRef();
 
-  const handleSignout = () => {
-    dispatch(logoutUser());
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const user = await loginService.login({
+        username,
+        password,
+      });
+
+      window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
+
+      blogService.setToken(user.token);
+      setUser(user);
+      setUserName("");
+      setPassword("");
+    } catch (exception) {
+      setErrorMessage("Incorrect username or password");
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
   };
 
-  return (
-    <Container>
-      {currentUser && (
-        <AppBar position="static">
-          <Toolbar sx={{ justifyContent: "space-around" }}>
-            <Button color="inherit" component={Link} to="/blogs">
-              Blogs
-            </Button>
-            <Button color="inherit" component={Link} to="/users">
-              Users
-            </Button>
+  const createBlog = (blogObject) => {
+    blogFormRef.current.toggleVisibility();
 
-            <Button color="inherit" onClick={handleSignout}>
-              Sign Out
-            </Button>
-            <Typography>{`${currentUser.name} logged in`}</Typography>
-          </Toolbar>
-        </AppBar>
+    blogService
+      .create(blogObject)
+      .then((newBlog) => {
+        setBlogs(blogs.concat({ ...newBlog, user: user }));
+        setNotification(
+          `a new blog ${newBlog.title} by ${newBlog.author} has been added`
+        );
+        setTimeout(() => {
+          setNotification(null);
+        }, 5000);
+      })
+      .catch((error) => {
+        setErrorMessage(`Failed to create new blog.`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      });
+  };
+
+  const handleLike = (id) => {
+    const blogToUpdate = blogs.find((b) => b.id === id);
+
+    const updateBlog = {
+      ...blogToUpdate,
+      likes: blogToUpdate.likes + 1,
+    };
+
+    blogService
+      .update(updateBlog)
+      .then((returnedBlog) => {
+        setBlogs(
+          blogs
+            .map((blog) => (blog.id !== id ? blog : returnedBlog))
+            .sort((a, b) => b.likes - a.likes)
+        );
+      })
+      .catch((error) => {
+        setErrorMessage(
+          `Blog ${blogToUpdate.title} was already removed from server`
+        );
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      });
+  };
+
+  const deleteBlog = (blogObject) => {
+    if (
+      window.confirm(`Remove blog ${blogObject.title} by ${blogObject.author}?`)
+    ) {
+      blogService.remove(blogObject).then(() => {
+        setBlogs(blogs.filter((blog) => blog.id !== blogObject.id));
+        setNotification("Blog removed");
+        setTimeout(() => {
+          setNotification(null);
+        }, 5000);
+      });
+    }
+  };
+
+  const handleSignout = () => {
+    window.localStorage.clear();
+    setUser(null);
+  };
+
+  const blogsList = () => (
+    <>
+      <div>
+        {`${user.name} logged in`}
+        <button type="button" onClick={handleSignout}>
+          Sign Out
+        </button>
+      </div>
+      <Toggleable buttonLabel="New Blog" ref={blogFormRef}>
+        <BlogForm createBlog={createBlog} />
+      </Toggleable>
+      {blogs.map((blog) => (
+        <Blog
+          key={blog.id}
+          blog={blog}
+          deleteBlog={deleteBlog}
+          handleLike={() => handleLike(blog.id)}
+        />
+      ))}
+    </>
+  );
+
+  return (
+    <div>
+      <h2>Blogs</h2>
+      {notification && (
+        <Notifcation message={notification} type="notification" />
       )}
-      <Notifcation />
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 4,
-        }}
-      >
-        <Typography variant="h2">blog app</Typography>
-        <Routes>
-          <Route
-            path="/"
-            element={currentUser ? <BlogList /> : <LoginForm />}
-          />
-          <Route path="/blogs" element={<BlogList />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/blogs/:id" element={<Blog />} />
-          <Route path="/users/:id" element={<User />} />
-          <Route path="/users" element={<UserList />} />
-        </Routes>
-      </Box>
-    </Container>
+      {errorMessage && <Notifcation message={errorMessage} type="error" />}
+      {user ? (
+        blogsList()
+      ) : (
+        <LoginForm
+          handleLogin={handleLogin}
+          username={username}
+          password={password}
+          handleUsernameChange={({ target }) => setUserName(target.value)}
+          handlePasswordChange={({ target }) => setPassword(target.value)}
+        />
+      )}
+    </div>
   );
 };
 

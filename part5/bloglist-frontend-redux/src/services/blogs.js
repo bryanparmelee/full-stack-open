@@ -12,6 +12,12 @@ const getAll = async () => {
   return response.data;
 };
 
+const getBlogById = async (id) => {
+  const response = await axios.get(`${baseUrl}/${id}`);
+  console.log(response.data);
+  return response.data;
+};
+
 const create = async (newObject) => {
   const config = {
     headers: { Authorization: token },
@@ -36,7 +42,38 @@ const remove = async (blogObject) => {
   };
   const url = `${baseUrl}/${blogObject.id}`;
   const response = await axios.delete(url, config);
+  return response;
+};
+
+const like = async (blogObject) => {
+  const config = {
+    headers: { Authorization: token },
+  };
+  const likedBlog = {
+    ...blogObject,
+    likes: blogObject.likes + 1,
+  };
+  const url = `${baseUrl}/${blogObject.id}`;
+  const response = await axios.put(url, likedBlog, config);
   return response.data;
 };
 
-export default { setToken, getAll, create, update, remove };
+const comment = async (comment, blogId) => {
+  const config = {
+    headers: { Authorization: token },
+  };
+  const url = `${baseUrl}/${blogId}/comments`;
+  const response = await axios.post(url, comment, config);
+  return response.data;
+};
+
+export default {
+  setToken,
+  getAll,
+  getBlogById,
+  create,
+  update,
+  remove,
+  like,
+  comment,
+};
