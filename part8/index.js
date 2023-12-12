@@ -189,20 +189,64 @@ const resolvers = {
         const author = new Author({ name: args.author });
         const newAuthor = await author.save();
         const book = new Book({ ...args, author: newAuthor });
-        return book.save();
+        try {
+          await book.save();
+        } catch (error) {
+          throw new GraphQLError("Saving book failed", {
+            extensions: {
+              code: "BAD_USER_INPUT",
+              invalidArgs: args.title,
+              error,
+            },
+          });
+        }
+        return book;
       } else {
         const book = new Book({ ...args, author: existingAuthor });
-        return book.save();
+        try {
+          await book.save();
+        } catch (error) {
+          throw new GraphQLError("Saving author failed", {
+            extensions: {
+              code: "BAD_USER_INPUT",
+              invalidArgs: args.title,
+              error,
+            },
+          });
+        }
+        return book;
       }
     },
     addAuthor: async (root, args) => {
       const author = new Author({ ...args });
-      return author.save();
+      try {
+        await author.save();
+      } catch (error) {
+        throw new GraphQLError("Saving author failed", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.name,
+            error,
+          },
+        });
+      }
+      return author;
     },
     editAuthor: async (root, args) => {
       const author = await Author.findOne({ name: args.name });
       author.born = args.setBornTo;
-      return author.save();
+      try {
+        await author.save();
+      } catch (error) {
+        throw new GraphQLError("Saving author failed", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.name,
+            error,
+          },
+        });
+      }
+      return author;
     },
   },
 };
