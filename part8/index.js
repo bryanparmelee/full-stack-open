@@ -88,12 +88,16 @@ const resolvers = {
     allBooks: async (root, args) => {
       if (args.author && !args.genre) {
         const author = await Author.findOne({ name: args.author });
-        const booksByAuthor = await Book.find({ author: author });
+        const booksByAuthor = await Book.find({ author: author }).populate(
+          "author"
+        );
         return booksByAuthor;
       }
 
       if (args.genre && !args.author) {
-        const booksByGenre = await Book.find({ genres: args.genre });
+        const booksByGenre = await Book.find({ genres: args.genre }).populate(
+          "author"
+        );
         return booksByGenre;
       }
 
@@ -102,11 +106,11 @@ const resolvers = {
         const booksByAuthorAndGenre = await Book.find({
           author: author,
           genres: args.genre,
-        });
+        }).populate("author");
         return booksByAuthorAndGenre;
       }
 
-      return Book.find({});
+      return Book.find({}).populate("author");
     },
     allAuthors: async () => Author.find({}),
     me: (root, args, context) => context.currentUser,
