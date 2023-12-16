@@ -54,6 +54,7 @@ const typeDefs = `
     allBooks(author: String, genre: String): [Book!]!,
     allAuthors: [Author!]!,
     me: User,
+    booksByGenre(genre: String!): [Book!]!
   }
 
   type Mutation {
@@ -114,6 +115,10 @@ const resolvers = {
     },
     allAuthors: async () => Author.find({}),
     me: (root, args, context) => context.currentUser,
+    booksByGenre: async (root, args) => {
+      const books = await Book.find({ genres: args.genre }).populate("author");
+      return books;
+    },
   },
   // Author: {
   //   bookCount: (root) => books.filter((b) => b.author === root.name).length,
