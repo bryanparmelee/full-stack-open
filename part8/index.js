@@ -116,6 +116,7 @@ const resolvers = {
     allAuthors: async () => Author.find({}),
     me: (root, args, context) => context.currentUser,
     booksByGenre: async (root, args) => {
+      if (args.genre === "all genres") return null;
       const books = await Book.find({ genres: args.genre }).populate("author");
       return books;
     },
