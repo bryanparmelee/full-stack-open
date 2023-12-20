@@ -15,6 +15,7 @@ const BirthYearForm = ({ options }) => {
     const author = selectedOption.value;
 
     changeBirthyear({ variables: { author, birthyear } });
+
     setBirthyear("");
   };
 

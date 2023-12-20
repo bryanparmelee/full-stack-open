@@ -3,13 +3,14 @@ import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import LoginForm from "./components/LoginForm";
+import Notify from "./components/Notification";
 import Recommend from "./components/Recommend";
-import { useApolloClient, useQuery } from "@apollo/client";
-import { ME } from "./queries";
+import { useApolloClient } from "@apollo/client";
 
 const App = () => {
   const [page, setPage] = useState("authors");
   const [token, setToken] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const client = useApolloClient();
 
   useEffect(() => {
@@ -17,20 +18,19 @@ const App = () => {
     setToken(loggedInUser);
   }, []);
 
+  const notify = (message) => {
+    setErrorMessage(message);
+    setTimeout(() => {
+      setErrorMessage(null);
+    }, 5000);
+  };
+
   const handleLogout = () => {
+    setPage("authors");
     setToken(null);
     localStorage.clear();
     client.resetStore();
-    setPage("authors");
   };
-
-  const result = useQuery(ME);
-
-  if (result.loading) {
-    return <div>Loading...</div>;
-  }
-
-  const currentUser = result.data.me;
 
   return (
     <div>
@@ -47,19 +47,20 @@ const App = () => {
           </>
         )}
       </div>
+      <Notify errorMessage={errorMessage} />
+      <Authors show={page === "authors"} setError={notify} />
 
-      <Authors show={page === "authors"} />
+      <Books show={page === "books"} setError={notify} />
 
-      <Books show={page === "books"} />
+      <NewBook show={page === "add"} setPage={setPage} setError={notify} />
 
-      <NewBook show={page === "add"} />
-
-      <Recommend show={page === "recommend"} currentUser={currentUser} />
+      <Recommend show={page === "recommend"} setError={notify} />
 
       <LoginForm
         show={page === "login"}
         setToken={setToken}
         setPage={setPage}
+        setError={notify}
       />
     </div>
   );

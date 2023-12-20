@@ -1,14 +1,10 @@
 import { useQuery } from "@apollo/client";
-import { BOOKS_BY_GENRE } from "../queries";
+import { BOOKS_BY_USER } from "../queries";
 
-const Recommend = ({ show, currentUser }) => {
-  const result = useQuery(BOOKS_BY_GENRE, {
-    variables: {
-      genre: currentUser.favoriteGenre,
-    },
-  });
+const Recommend = (props) => {
+  const result = useQuery(BOOKS_BY_USER);
 
-  if (!show) {
+  if (!props.show) {
     return null;
   }
 
@@ -16,13 +12,18 @@ const Recommend = ({ show, currentUser }) => {
     return <div>Loading....</div>;
   }
 
-  const books = result.data.booksByGenre;
+  if (result.error) {
+    return <div>Error {result.error}</div>;
+  }
+
+  const books = [...result.data.booksByUser];
+  const genre = result.data.me.favoriteGenre;
 
   return (
     <div>
       <h2>Recommendations</h2>
       <p>
-        books in your favorite genre <b>{currentUser.favoriteGenre}</b>
+        books in your favorite genre <b>{genre}</b>
       </p>
       <table>
         <tbody>
