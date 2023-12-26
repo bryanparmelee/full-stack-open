@@ -1,19 +1,15 @@
 import { useQuery } from "@apollo/client";
 import { BOOKS_BY_USER } from "../queries";
 
-const Recommend = (props) => {
+const Recommend = ({ setError }) => {
   const result = useQuery(BOOKS_BY_USER);
-
-  if (!props.show) {
-    return null;
-  }
 
   if (result.loading) {
     return <div>Loading....</div>;
   }
 
   if (result.error) {
-    return <div>Error {result.error}</div>;
+    setError(result.error);
   }
 
   const books = [...result.data.booksByUser];

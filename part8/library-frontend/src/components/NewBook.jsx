@@ -2,13 +2,16 @@ import { useState } from "react";
 import { updateCache } from "../App";
 import { useMutation } from "@apollo/client";
 import { ALL_BOOKS, CREATE_BOOK } from "../queries";
+import { useNavigate } from "react-router-dom";
 
-const NewBook = ({ show, setPage, setError }) => {
+const NewBook = ({ setError }) => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [published, setPublished] = useState("");
   const [genre, setGenre] = useState("");
   const [genres, setGenres] = useState([]);
+
+  const navigate = useNavigate();
 
   const [createBook] = useMutation(CREATE_BOOK, {
     onError: (error) => {
@@ -20,10 +23,6 @@ const NewBook = ({ show, setPage, setError }) => {
     },
   });
 
-  if (!show) {
-    return null;
-  }
-
   const submit = async (event) => {
     event.preventDefault();
 
@@ -34,7 +33,7 @@ const NewBook = ({ show, setPage, setError }) => {
     setAuthor("");
     setGenres([]);
     setGenre("");
-    setPage("books");
+    navigate("/books");
   };
 
   const addGenre = () => {
@@ -44,6 +43,7 @@ const NewBook = ({ show, setPage, setError }) => {
 
   return (
     <div>
+      <h2>Add book</h2>
       <form onSubmit={submit}>
         <div>
           title

@@ -2,15 +2,15 @@ import { useQuery } from "@apollo/client";
 import { ALL_AUTHORS } from "../queries";
 import BirthYearForm from "./BirthYearForm";
 
-const Authors = (props) => {
+const Authors = ({ setError }) => {
   const result = useQuery(ALL_AUTHORS);
-
-  if (!props.show) {
-    return null;
-  }
 
   if (result.loading) {
     return <div>loading...</div>;
+  }
+
+  if (result.error) {
+    setError(result.error);
   }
 
   const authors = [...result.data.allAuthors];
@@ -27,7 +27,7 @@ const Authors = (props) => {
         <table>
           <tbody>
             <tr>
-              <th></th>
+              <th>name</th>
               <th>born</th>
               <th>books</th>
             </tr>

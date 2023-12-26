@@ -6,6 +6,7 @@ import LoginForm from "./components/LoginForm";
 import Notify from "./components/Notification";
 import Recommend from "./components/Recommend";
 import { useApolloClient, useSubscription } from "@apollo/client";
+import { Routes, Route, Link, Navigate, useNavigate } from "react-router-dom";
 import { BOOK_ADDED, ALL_BOOKS } from "./queries";
 
 export const updateCache = (cache, query, addedBook) => {
@@ -25,10 +26,10 @@ export const updateCache = (cache, query, addedBook) => {
 };
 
 const App = () => {
-  const [page, setPage] = useState("authors");
   const [token, setToken] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const client = useApolloClient();
+  const navigate = useNavigate();
 
   useSubscription(BOOK_ADDED, {
     onData: ({ data, client }) => {
@@ -51,42 +52,89 @@ const App = () => {
   };
 
   const handleLogout = () => {
-    setPage("authors");
+    navigate("/");
     setToken(null);
     localStorage.clear();
-    client.resetStore();
+    client.clearStore();
+  };
+
+  const buttonStyle = {
+    padding: 5,
+    margin: 2,
+    borderRadius: 5,
+    backgroundColor: "#e4e4e4",
+    color: "black",
+    textDecoration: "none",
+    border: "1px solid black",
   };
 
   return (
     <div>
       <div>
-        <button onClick={() => setPage("authors")}>authors</button>
-        <button onClick={() => setPage("books")}>books</button>
+        <Link style={buttonStyle} to="/authors">
+          authors
+        </Link>
+        <Link style={buttonStyle} to="/books">
+          books
+        </Link>
         {!token ? (
-          <button onClick={() => setPage("login")}>login</button>
+          <Link style={buttonStyle} to="/login">
+            login
+          </Link>
         ) : (
           <>
-            <button onClick={() => setPage("add")}>add book</button>
-            <button onClick={() => setPage("recommend")}>recommend</button>
-            <button onClick={handleLogout}>logout</button>
+            <Link style={buttonStyle} to="/add-book">
+              add book
+            </Link>
+            <Link style={buttonStyle} to="/recommend">
+              recommend
+            </Link>
+            <button
+              style={{ ...buttonStyle, padding: 7 }}
+              onClick={handleLogout}
+            >
+              logout
+            </button>
           </>
         )}
       </div>
+
       <Notify errorMessage={errorMessage} />
-      <Authors show={page === "authors"} setError={notify} />
-
-      <Books show={page === "books"} setError={notify} />
-
-      <NewBook show={page === "add"} setPage={setPage} setError={notify} />
-
-      <Recommend show={page === "recommend"} setError={notify} />
-
-      <LoginForm
-        show={page === "login"}
-        setToken={setToken}
-        setPage={setPage}
-        setError={notify}
-      />
+      <Routes>
+        <Route path="/" element={<Authors setError={notify} />} />
+        <Route path="/authors" element={<Authors setError={notify} />} />
+        <Route path="/books" element={<Books setError={notify} />} />
+        <Route
+          path="/add-book"
+          element={
+            token ? (
+              <NewBook setError={notify} />
+            ) : (
+              <Navigate replace to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/recommend"
+          element={
+            token ? (
+              <Recommend setError={notify} />
+            ) : (
+              <Navigate replace to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            !token ? (
+              <LoginForm setError={notify} setToken={setToken} />
+            ) : (
+              <Authors setError={notify} />
+            )
+          }
+        />
+      </Routes>
     </div>
   );
 };

@@ -1,24 +1,20 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
 import { ALL_BOOKS, BOOKS_BY_GENRE } from "../queries";
 
-const Books = (props) => {
+const Books = ({ setError }) => {
   const booksResult = useQuery(ALL_BOOKS);
   const [getBooksByGenre, booksByGenreResult] = useLazyQuery(BOOKS_BY_GENRE);
-
-  if (!props.show) {
-    return null;
-  }
 
   if (booksResult.loading || getBooksByGenre.loading) {
     return <div>Loading...</div>;
   }
 
   if (booksResult.error) {
-    return <div>Error {booksResult.error}</div>;
+    setError(booksResult.error);
   }
 
-  if (getBooksByGenre.error) {
-    return <div>Error {getBooksByGenre.error}</div>;
+  if (booksByGenreResult.error) {
+    setError(booksByGenreResult.error);
   }
 
   const books = [...booksResult.data.allBooks];

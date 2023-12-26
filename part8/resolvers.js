@@ -38,7 +38,7 @@ const resolvers = {
 
       return Book.find({}).populate("author");
     },
-    allAuthors: async () => Author.find({}),
+    allAuthors: async () => Author.find({}).populate("books"),
     me: (root, args, context) => context.currentUser,
     booksByUser: async (root, args, context) => {
       const favoriteGenre = context.currentUser.favoriteGenre;
@@ -53,9 +53,9 @@ const resolvers = {
       return books;
     },
   },
-  // Author: {
-  //   bookCount: (root) => books.filter((b) => b.author === root.name).length,
-  // },
+  Author: {
+    bookCount: async (root) => root.books.length,
+  },
   Mutation: {
     addBook: async (root, args, context) => {
       const currentUser = context.currentUser;
@@ -76,6 +76,9 @@ const resolvers = {
         const book = new Book({ ...args, author: newAuthor });
         try {
           await book.save();
+          await author.updateOne({
+            $push: { books: book },
+          });
         } catch (error) {
           throw new GraphQLError("Saving book failed", {
             extensions: {
@@ -93,6 +96,9 @@ const resolvers = {
         const book = new Book({ ...args, author: existingAuthor });
         try {
           await book.save();
+          await existingAuthor.updateOne({
+            $push: { books: book },
+          });
         } catch (error) {
           throw new GraphQLError("Saving author failed", {
             extensions: {

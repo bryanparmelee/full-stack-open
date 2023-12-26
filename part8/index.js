@@ -13,9 +13,8 @@ const cors = require("cors");
 const http = require("http");
 
 const jwt = require("jsonwebtoken");
-
 const mongoose = require("mongoose");
-
+mongoose.set("strictQuery", false);
 const User = require("./models/user");
 
 const typeDefs = require("./schema");
@@ -25,8 +24,6 @@ require("dotenv").config();
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-mongoose.set("strictQuery", false);
-
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
@@ -35,6 +32,8 @@ mongoose
   .catch((error) => {
     console.log("error connection to MongoDB:", error.message);
   });
+
+mongoose.set("debug", true);
 
 const start = async () => {
   const app = express();
@@ -87,8 +86,10 @@ const start = async () => {
 
   const PORT = 4000;
 
-  httpServer.listen(PORT, () =>
-    console.log(`Server is now running on http://localhost:${PORT}`)
+  await new Promise((resolve) =>
+    httpServer.listen(PORT, () =>
+      console.log(`Server is now running on http://localhost:${PORT}`)
+    )
   );
 };
 

@@ -2,7 +2,7 @@ import { useMutation } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { LOGIN } from "../queries";
 
-const LoginForm = ({ show, setError, setToken, setPage }) => {
+const LoginForm = ({ setError, setToken }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -26,20 +26,17 @@ const LoginForm = ({ show, setError, setToken, setPage }) => {
     login({ variables: { username, password } });
     setUsername("");
     setPassword("");
-    setPage("authors");
   };
-
-  if (!show) {
-    return null;
-  }
 
   return (
     <div>
+      <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <div>
           username{" "}
           <input
             value={username}
+            autoComplete="username"
             onChange={({ target }) => setUsername(target.value)}
           />
         </div>
@@ -47,6 +44,7 @@ const LoginForm = ({ show, setError, setToken, setPage }) => {
           password{" "}
           <input
             type="password"
+            autoComplete="current-password"
             value={password}
             onChange={({ target }) => setPassword(target.value)}
           />
