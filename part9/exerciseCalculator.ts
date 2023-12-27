@@ -1,3 +1,10 @@
+import isNotNumber from "./isNotNumber";
+
+interface ExerciseValues {
+  target: number;
+  hours: number[];
+}
+
 interface ResultObject {
   periodLength: number;
   trainingDays: number;
@@ -8,7 +15,20 @@ interface ResultObject {
   average: number;
 }
 
-const calculateExercises = (hours: number[], target: number): ResultObject => {
+const parseArgs = (args: string[]): ExerciseValues => {
+  if (args.length < 4) throw new Error("Not enough arguments");
+  if (isNotNumber(Number(args[2])))
+    throw new Error("Provided values were not numbers!");
+  const hours = args.slice(3);
+  if (hours.some(isNotNumber))
+    throw new Error("Provided values were not numbers!");
+  return {
+    target: Number(args[2]),
+    hours: hours.map(Number),
+  };
+};
+
+const calculateExercises = (hours: number[], target: number) => {
   const periodLength = hours.length;
   const trainingDays = hours.filter((h) => h !== 0).length;
   const average = hours.reduce((a, b) => a + b, 0) / periodLength;
@@ -21,7 +41,7 @@ const calculateExercises = (hours: number[], target: number): ResultObject => {
       ? "not too bad but could be better"
       : "Not so great";
 
-  return {
+  console.log({
     periodLength,
     trainingDays,
     success,
@@ -29,7 +49,16 @@ const calculateExercises = (hours: number[], target: number): ResultObject => {
     ratingDescription,
     target,
     average,
-  };
+  });
 };
 
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2));
+try {
+  const { target, hours } = parseArgs(process.argv);
+  calculateExercises(hours, target);
+} catch (error) {
+  let errorMessage = "An error has occurred.";
+  if (error instanceof Error) {
+    errorMessage += " Error: " + error.message;
+  }
+  console.log(errorMessage);
+}
