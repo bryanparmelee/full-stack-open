@@ -1,8 +1,8 @@
-import isNotNumber from "./isNotNumber";
+import { isNotNumber } from "./isNotNumber";
 
-interface ExerciseValues {
+export interface ExerciseValues {
+  daily_exercises: number[];
   target: number;
-  hours: number[];
 }
 
 interface ResultObject {
@@ -23,12 +23,15 @@ const parseArgs = (args: string[]): ExerciseValues => {
   if (hours.some(isNotNumber))
     throw new Error("Provided values were not numbers!");
   return {
+    daily_exercises: hours.map(Number),
     target: Number(args[2]),
-    hours: hours.map(Number),
   };
 };
 
-const calculateExercises = (hours: number[], target: number) => {
+export const calculateExercises = (
+  hours: number[],
+  target: number
+): ResultObject => {
   const periodLength = hours.length;
   const trainingDays = hours.filter((h) => h !== 0).length;
   const average = hours.reduce((a, b) => a + b, 0) / periodLength;
@@ -41,7 +44,7 @@ const calculateExercises = (hours: number[], target: number) => {
       ? "not too bad but could be better"
       : "Not so great";
 
-  console.log({
+  return {
     periodLength,
     trainingDays,
     success,
@@ -49,12 +52,12 @@ const calculateExercises = (hours: number[], target: number) => {
     ratingDescription,
     target,
     average,
-  });
+  };
 };
 
 try {
-  const { target, hours } = parseArgs(process.argv);
-  calculateExercises(hours, target);
+  const { target, daily_exercises } = parseArgs(process.argv);
+  console.log(calculateExercises(daily_exercises, target));
 } catch (error) {
   let errorMessage = "An error has occurred.";
   if (error instanceof Error) {

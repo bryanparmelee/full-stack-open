@@ -1,4 +1,4 @@
-import isNotNumber from "./isNotNumber";
+import { isNotNumber } from "./isNotNumber";
 
 interface bmiValues {
   height: number;
@@ -40,5 +40,3 @@ try {
   }
   console.log(errorMessage);
 }
-
-export default calculateBmi;
