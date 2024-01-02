@@ -1,16 +1,9 @@
-interface ContentProps {
-  name: string;
-  exerciseCount: number;
-}
+import Part from "./Part";
 
-const Content = (props: ContentProps) => {
-  return (
-    <>
-      <p>
-        {props.name} {props.exerciseCount}
-      </p>
-    </>
-  );
+import { CoursePart } from "../App";
+
+const Content = (props: CoursePart) => {
+  return <Part {...props} />;
 };
 
 export default Content;
