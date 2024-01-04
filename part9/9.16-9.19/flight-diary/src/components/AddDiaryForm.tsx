@@ -26,6 +26,7 @@ const AddDiaryForm = ({ onSubmit }: Props) => {
   };
   return (
     <div>
+      <h2>Add new entry</h2>
       <form onSubmit={handleSubmit}>
         <div>
           date:

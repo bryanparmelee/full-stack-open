@@ -7,7 +7,7 @@ import diaryService from "./services/diaries";
 
 function App() {
   const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<string | null>(null);
 
   console.log(error);
 
@@ -18,6 +18,13 @@ function App() {
     };
     void fetchDiaries();
   }, []);
+
+  const handleError = (message: string | null): void => {
+    setError(message);
+    setTimeout(() => {
+      setError(null);
+    }, 5000);
+  };
 
   const addNewDiaryEntry = async (formValues: NewDiaryEntry) => {
     try {
@@ -34,13 +41,13 @@ function App() {
             ""
           );
           console.error(message);
-          setError(message);
+          handleError(message);
         } else {
-          setError("Unrecognized axios error");
+          handleError("Unrecognized axios error");
         }
       } else {
         console.error("Unknown error", error);
-        setError("Unknown error");
+        handleError("Unknown error");
       }
     }
   };
@@ -49,6 +56,7 @@ function App() {
 
   return (
     <div>
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <AddDiaryForm onSubmit={addNewDiaryEntry} />
       <h2>Diary Entries</h2>
       {diaries.map((diary) => (
