@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { DiaryEntry, NewDiaryEntry } from "./types";
 import AddDiaryForm from "./components/AddDiaryForm";
+import DiaryList from "./components/DiaryList";
 
 import diaryService from "./services/diaries";
 
 function App() {
   const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
-
-  console.log(error);
 
   useEffect(() => {
     const fetchDiaries = async () => {
@@ -19,7 +18,7 @@ function App() {
     void fetchDiaries();
   }, []);
 
-  const handleError = (message: string | null): void => {
+  const handleError = (message: string): void => {
     setError(message);
     setTimeout(() => {
       setError(null);
@@ -58,17 +57,7 @@ function App() {
     <div>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <AddDiaryForm onSubmit={addNewDiaryEntry} />
-      <h2>Diary Entries</h2>
-      {diaries.map((diary) => (
-        <>
-          <h3>{diary.date}</h3>
-          <p>
-            visibilty: {diary.visibility}
-            <br />
-            weather: {diary.weather}
-          </p>
-        </>
-      ))}
+      <DiaryList {...diaries} />
     </div>
   );
 }
