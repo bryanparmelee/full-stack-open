@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Patient } from "../types";
+import { Patient, BaseEntry } from "../types";
 import patientService from "../services/patients";
+import EntryData from "./EntryData";
 
 type searchParams = {
   id: string;
@@ -25,8 +26,19 @@ const PatientPage = () => {
     <div>
       <h2>{patient.name}</h2>
 
-      <p>ssn: {patient.ssn}</p>
-      <p>occupation: {patient.occupation}</p>
+      <p>
+        ssn: {patient.ssn}
+        <br />
+        occupation: {patient.occupation}
+      </p>
+      {patient.entries.length > 0 && (
+        <>
+          <h2>entries</h2>
+          {patient.entries.map((entry: BaseEntry) => (
+            <EntryData key={entry.id} {...entry} />
+          ))}
+        </>
+      )}
     </div>
   );
 };

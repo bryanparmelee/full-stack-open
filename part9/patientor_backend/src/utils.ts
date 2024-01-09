@@ -49,19 +49,19 @@ const parseOccupation = (occupation: unknown): string => {
   return occupation;
 };
 
-const entryTypes = ["Hosptial", "OccupationalHealthcare", "HealthCheck"];
+const entryTypes = ["Hospital", "OccupationalHealthcare", "HealthCheck"];
 
 const parseEntries = (entries: unknown): Entry[] => {
-  if (
-    entries instanceof Array &&
-    entries.every(
-      (entry) =>
-        isString(entry.type) && entryTypes.includes(entry.type as string)
-    )
-  ) {
-    return entries as Entry[];
+  if (!entries || !Array.isArray(entries)) {
+    throw new Error("Missing entries");
   }
-  throw new Error("Incorrect or missing entries");
+  if (entries.length === 0) {
+    return [] as Entry[];
+  }
+  if (!entries.every((entry) => entryTypes.includes(`${entry.type}`))) {
+    throw new Error("Incomplete entries");
+  }
+  return entries as Entry[];
 };
 
 const toNewPatientEntry = (object: unknown): NewPatientEntry => {
