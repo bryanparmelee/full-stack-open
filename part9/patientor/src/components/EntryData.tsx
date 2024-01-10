@@ -1,16 +1,29 @@
-import { BaseEntry } from "../types";
+import { BaseEntry, Diagnosis } from "../types";
 
-const EntryData = (props: BaseEntry) => {
+interface Props {
+  patientEntry: BaseEntry;
+  diagnoses: Diagnosis[];
+}
+
+const EntryData = ({ patientEntry, diagnoses }: Props) => {
   return (
     <div>
-      {props.date} {props.description}
-      {props.diagnosisCodes && props.diagnosisCodes.length > 0 && (
-        <ul>
-          {props.diagnosisCodes?.map((code: string) => (
-            <li key={code}>{code}</li>
-          ))}
-        </ul>
-      )}
+      {patientEntry.date} {patientEntry.description}
+      {patientEntry.diagnosisCodes &&
+        patientEntry.diagnosisCodes.length > 0 && (
+          <ul>
+            {patientEntry.diagnosisCodes?.map((code: string) => {
+              const diagnosis: Diagnosis | undefined = diagnoses.find(
+                (d) => d.code === code
+              );
+              return (
+                <li key={code}>
+                  {code} {diagnosis && diagnosis.name}
+                </li>
+              );
+            })}
+          </ul>
+        )}
     </div>
   );
 };
