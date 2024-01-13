@@ -29,18 +29,18 @@ export interface SickLeave {
   endDate: string;
 }
 
-interface HealthCheckEntry extends BaseEntry {
+export interface HealthCheckEntry extends BaseEntry {
   type: "HealthCheck";
   healthCheckRating: HealthCheckRating;
 }
 
-interface OccupationalHealthcareEntry extends BaseEntry {
+export interface OccupationalHealthcareEntry extends BaseEntry {
   type: "OccupationalHealthcare";
   sickLeave?: SickLeave;
   employerName: string;
 }
 
-interface HospitalEntry extends BaseEntry {
+export interface HospitalEntry extends BaseEntry {
   type: "Hospital";
   discharge: Discharge;
 }
@@ -58,7 +58,7 @@ export interface Patient {
   ssn: string;
   gender: Gender;
   occupation: string;
-  entries: BaseEntry[];
+  entries: Entry[];
 }
 
 export type PatientFormValues = Omit<Patient, "id" | "entries">;
