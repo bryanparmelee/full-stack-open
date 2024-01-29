@@ -29,18 +29,18 @@ export interface SickLeave {
   endDate: string;
 }
 
-interface HealthCheckEntry extends BaseEntry {
+export interface HealthCheckEntry extends BaseEntry {
   type: "HealthCheck";
   healthCheckRating: HealthCheckRating;
 }
 
-interface OccupationalHealthcareEntry extends BaseEntry {
+export interface OccupationalHealthcareEntry extends BaseEntry {
   type: "OccupationalHealthcare";
   sickLeave?: SickLeave;
   employerName: string;
 }
 
-interface HospitalEntry extends BaseEntry {
+export interface HospitalEntry extends BaseEntry {
   type: "Hospital";
   discharge: Discharge;
 }
@@ -64,6 +64,12 @@ export interface Patient {
 export type NonSensitivePatientEntry = Omit<Patient, "ssn" | "entries">;
 
 export type NewPatientEntry = Omit<Patient, "id">;
+
+type UnionOmit<T, K extends string | number | symbol> = T extends unknown
+  ? Omit<T, K>
+  : never;
+
+export type EntryWithoutId = UnionOmit<Entry, "id">;
 
 export type Entry =
   | HospitalEntry
