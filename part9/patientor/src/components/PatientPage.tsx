@@ -53,13 +53,12 @@ const PatientPage = ({ diagnoses }: Props) => {
           setError("Unknown error");
         }
       }
+    } else {
+      setError("Patient not found.");
     }
-    setError("patient not found");
   };
 
   if (!patient) return null;
-
-  console.log(error);
 
   return (
     <div>
@@ -82,7 +81,7 @@ const PatientPage = ({ diagnoses }: Props) => {
           ))}
         </>
       )}
-      <AddEntryForm onSubmit={submitNewEntry} />
+      <AddEntryForm onSubmit={submitNewEntry} error={error} />
     </div>
   );
 };

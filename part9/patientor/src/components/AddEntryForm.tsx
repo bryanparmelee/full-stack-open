@@ -1,12 +1,13 @@
 import { SyntheticEvent, useState } from "react";
 import { EntryWithoutId } from "../types";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, Alert } from "@mui/material";
 
 interface Props {
   onSubmit: (values: EntryWithoutId) => void;
+  error?: string;
 }
 
-const AddEntryForm = ({ onSubmit }: Props) => {
+const AddEntryForm = ({ onSubmit, error }: Props) => {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [specialist, setSpecialist] = useState("");
@@ -42,6 +43,7 @@ const AddEntryForm = ({ onSubmit }: Props) => {
   return (
     <div>
       <h2>Add New Entry</h2>
+      {error && <Alert severity="error">{error}</Alert>}
       <form onSubmit={addEntry}>
         <TextField
           label="Description"
