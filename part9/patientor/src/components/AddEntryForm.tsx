@@ -1,5 +1,5 @@
-import { SyntheticEvent, useState } from "react";
-import { EntryType, EntryWithoutId } from "../types";
+import { SyntheticEvent, useEffect, useState } from "react";
+import { Diagnosis, EntryType, EntryWithoutId } from "../types";
 import {
   TextField,
   Button,
@@ -13,6 +13,7 @@ import {
 interface Props {
   onSubmit: (values: EntryWithoutId) => void;
   error?: string;
+  diagnoses: Diagnosis[];
 }
 
 interface EntryTypeOption {
@@ -27,7 +28,7 @@ const entryTypeOptions: EntryTypeOption[] = Object.values(EntryType).map(
   })
 );
 
-const AddEntryForm = ({ onSubmit, error }: Props) => {
+const AddEntryForm = ({ onSubmit, error, diagnoses }: Props) => {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -35,13 +36,12 @@ const AddEntryForm = ({ onSubmit, error }: Props) => {
   const [dischargeDate, setDischargeDate] = useState("");
   const [criteria, setCriteria] = useState("");
   const [specialist, setSpecialist] = useState("");
-  const [diagnosisCodes, setDiagnosisCodes] = useState<string[] | undefined>();
+  const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
   const [type, setType] = useState(EntryType.HealthCheckEntry);
   const [healthCheckRating, setHealthCheckRating] = useState(0);
   const [employerName, setEmployerName] = useState("");
 
   const handleEntryTypeChange = (event: SelectChangeEvent<string>) => {
-    event.preventDefault();
     if (typeof event.target.value === "string") {
       const value = event.target.value;
       const entryType = Object.values(EntryType).find(
@@ -53,21 +53,33 @@ const AddEntryForm = ({ onSubmit, error }: Props) => {
     }
   };
 
+  const handleDiagnosisCodeChange = (
+    event: SelectChangeEvent<typeof diagnosisCodes>
+  ) => {
+    const {
+      target: { value },
+    } = event;
+    setDiagnosisCodes(typeof value === "string" ? value.split(",") : value);
+  };
+
   const addEntry = (event: SyntheticEvent) => {
     event.preventDefault();
 
-    const newEntry = diagnosisCodes
-      ? {
-          description,
-          date,
-          specialist,
-          diagnosisCodes,
-        }
-      : {
-          description,
-          date,
-          specialist,
-        };
+    const newEntry =
+      // diagnosisCodes.length > 0
+      //   ? {
+      //       description,
+      //       date,
+      //       specialist,
+      //       diagnosisCodes,
+      //     }
+      //   : {
+      //       description,
+      //       date,
+      //       specialist,
+      //     };
+
+      { description, date, specialist, diagnosisCodes };
 
     switch (type) {
       case "HealthCheck":
@@ -104,6 +116,10 @@ const AddEntryForm = ({ onSubmit, error }: Props) => {
         break;
     }
   };
+
+  useEffect(() => {
+    console.log(diagnosisCodes);
+  }, [diagnosisCodes]);
 
   return (
     <div>
@@ -143,12 +159,19 @@ const AddEntryForm = ({ onSubmit, error }: Props) => {
           onChange={({ target }) => setSpecialist(target.value)}
         />
 
-        <TextField
-          label="Diagnosis Codes"
+        <InputLabel style={{ marginTop: 20 }}>Diagnosis Codes</InputLabel>
+        <Select
+          multiple
           fullWidth
           value={diagnosisCodes}
-          onChange={({ target }) => setDiagnosisCodes(target.value.split(","))}
-        />
+          onChange={handleDiagnosisCodeChange}
+        >
+          {diagnoses.map((d) => (
+            <MenuItem key={d.code} value={d.code}>
+              {d.code}
+            </MenuItem>
+          ))}
+        </Select>
 
         {type === "HealthCheck" && (
           <TextField

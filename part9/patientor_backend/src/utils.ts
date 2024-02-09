@@ -1,7 +1,6 @@
 import {
   NewPatientEntry,
   Gender,
-  Entry,
   Diagnosis,
   EntryWithoutId,
   Discharge,
@@ -62,20 +61,20 @@ const parseOccupation = (occupation: unknown): string => {
   return occupation;
 };
 
-const entryTypes = ["Hospital", "OccupationalHealthcare", "HealthCheck"];
+// const entryTypes = ["Hospital", "OccupationalHealthcare", "HealthCheck"];
 
-const parseEntries = (entries: unknown): Entry[] => {
-  if (!entries || !Array.isArray(entries)) {
-    throw new Error("Missing entries");
-  }
-  if (entries.length === 0) {
-    return [] as Entry[];
-  }
-  if (!entries.every((entry) => entryTypes.includes(`${entry.type}`))) {
-    throw new Error("Incomplete entries");
-  }
-  return entries as Entry[];
-};
+// const parseEntries = (entries: unknown): Entry[] => {
+//   if (!entries || !Array.isArray(entries)) {
+//     throw new Error("Missing entries");
+//   }
+//   if (entries.length === 0) {
+//     return [] as Entry[];
+//   }
+//   if (!entries.every((entry) => entryTypes.includes(`${entry.type}`))) {
+//     throw new Error("Incomplete entries");
+//   }
+//   return entries as Entry[];
+// };
 
 export const toNewPatientEntry = (object: unknown): NewPatientEntry => {
   if (!object || typeof object !== "object") {
@@ -86,8 +85,7 @@ export const toNewPatientEntry = (object: unknown): NewPatientEntry => {
     "dateOfBirth" in object &&
     "ssn" in object &&
     "gender" in object &&
-    "occupation" in object &&
-    "entries" in object
+    "occupation" in object
   ) {
     const newPatient: NewPatientEntry = {
       name: parseName(object.name),
@@ -95,7 +93,6 @@ export const toNewPatientEntry = (object: unknown): NewPatientEntry => {
       ssn: parseSsn(object.ssn),
       gender: parseGender(object.gender),
       occupation: parseOccupation(object.occupation),
-      entries: parseEntries(object.entries),
     };
     return newPatient;
   }
@@ -199,7 +196,7 @@ export const toNewEntry = (object: unknown) => {
             description: parseDescription(object.description),
             date: parseDate(object.date),
             specialist: parseSpecialist(object.specialist),
-            diagnosisCodes: parseDiagnosisCodes(object.diagnosisCodes),
+            diagnosisCodes: parseDiagnosisCodes(object),
           }
         : {
             description: parseDescription(object.description),

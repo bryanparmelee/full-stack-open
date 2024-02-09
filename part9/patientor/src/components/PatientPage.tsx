@@ -58,7 +58,9 @@ const PatientPage = ({ diagnoses }: Props) => {
     }
   };
 
-  if (!patient) return null;
+  if (!patient) {
+    return <div>Patient not found.</div>;
+  }
 
   return (
     <div>
@@ -81,7 +83,11 @@ const PatientPage = ({ diagnoses }: Props) => {
           ))}
         </>
       )}
-      <AddEntryForm onSubmit={submitNewEntry} error={error} />
+      <AddEntryForm
+        onSubmit={submitNewEntry}
+        error={error}
+        diagnoses={diagnoses}
+      />
     </div>
   );
 };

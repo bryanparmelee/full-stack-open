@@ -44,7 +44,6 @@ router.post("/:id/entries", (req, res) => {
       const addedEntry = patientService.addEntry(patientToUpdate, newEntry);
       res.json(addedEntry);
     }
-    res.status(404).send("patient not found");
   } catch (error: unknown) {
     let errorMessage = "Something went wrong.";
     if (error instanceof Error) {

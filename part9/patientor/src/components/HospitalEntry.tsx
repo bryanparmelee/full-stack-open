@@ -8,7 +8,7 @@ interface Props {
 
 const HospitalEntryDetails = ({ patientEntry, diagnoses }: Props) => {
   return (
-    <div>
+    <div style={{ border: "1px solid black", marginBottom: "10px" }}>
       {patientEntry.date} {patientEntry.type.split(/(?=[A-Z])/).join(" ")}
       <br />
       {patientEntry.description}
@@ -24,6 +24,9 @@ const HospitalEntryDetails = ({ patientEntry, diagnoses }: Props) => {
           </>
         )}
       diagnosed by {patientEntry.specialist}
+      <br />
+      Discharged on {patientEntry.discharge.date}:{" "}
+      {patientEntry.discharge.criteria}
     </div>
   );
 };

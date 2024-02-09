@@ -11,7 +11,7 @@ const OccupationalHealthcareEntryDetails = ({
   diagnoses,
 }: Props) => {
   return (
-    <div>
+    <div style={{ border: "1px solid black", marginBottom: "10px" }}>
       {patientEntry.date} {patientEntry.type.split(/(?=[A-Z])/).join(" ")}{" "}
       {patientEntry.employerName}
       <br />
