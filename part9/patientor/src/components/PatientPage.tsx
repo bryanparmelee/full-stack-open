@@ -4,7 +4,8 @@ import { Patient, Diagnosis, Entry, EntryWithoutId } from "../types";
 import patientService from "../services/patients";
 import EntryDetails from "./EntryDetails";
 import axios from "axios";
-import AddEntryForm from "./AddEntryForm";
+import AddEntryModal from "./AddEntryModal";
+import { Button } from "@mui/material";
 
 type searchParams = {
   id: string;
@@ -15,9 +16,17 @@ interface Props {
 }
 
 const PatientPage = ({ diagnoses }: Props) => {
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [patient, setPatient] = useState<Patient>();
   const [error, setError] = useState<string>();
   const { id } = useParams<searchParams>();
+
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
 
   useEffect(() => {
     const fetchPatient = async (id: string) => {
@@ -36,6 +45,7 @@ const PatientPage = ({ diagnoses }: Props) => {
           entries: patient.entries.concat(entry),
         };
         setPatient(updatedPatient);
+        setModalOpen(false);
       } catch (e: unknown) {
         if (axios.isAxiosError(e)) {
           if (e?.response?.data && typeof e?.response?.data === "string") {
@@ -83,11 +93,17 @@ const PatientPage = ({ diagnoses }: Props) => {
           ))}
         </>
       )}
-      <AddEntryForm
+
+      <AddEntryModal
+        modalOpen={modalOpen}
         onSubmit={submitNewEntry}
         error={error}
+        onClose={closeModal}
         diagnoses={diagnoses}
       />
+      <Button variant="contained" onClick={() => openModal()}>
+        Add New Entry
+      </Button>
     </div>
   );
 };

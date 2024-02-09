@@ -1,5 +1,6 @@
 import { Diagnosis, HealthCheckEntry } from "../types";
 import DiagnosisDetails from "./DiagnosisDetails";
+import HealthRatingBar from "./HealthRatingBar";
 
 interface Props {
   patientEntry: HealthCheckEntry;
@@ -23,7 +24,10 @@ const HealthCheckEntryDetails = ({ patientEntry, diagnoses }: Props) => {
             <br />
           </>
         )}
-      {patientEntry.healthCheckRating}
+      <HealthRatingBar
+        rating={patientEntry.healthCheckRating}
+        showText={true}
+      />
       <br />
       diagnosed by {patientEntry.specialist}
     </div>

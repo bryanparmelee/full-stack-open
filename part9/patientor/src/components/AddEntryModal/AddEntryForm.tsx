@@ -1,5 +1,10 @@
-import { SyntheticEvent, useEffect, useState } from "react";
-import { Diagnosis, EntryType, EntryWithoutId } from "../types";
+import { SyntheticEvent, useState } from "react";
+import {
+  Diagnosis,
+  EntryType,
+  EntryWithoutId,
+  HealthCheckRating,
+} from "../../types";
 import {
   TextField,
   Button,
@@ -8,12 +13,14 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Grid,
 } from "@mui/material";
 
 interface Props {
   onSubmit: (values: EntryWithoutId) => void;
   error?: string;
   diagnoses: Diagnosis[];
+  onCancel: () => void;
 }
 
 interface EntryTypeOption {
@@ -28,7 +35,21 @@ const entryTypeOptions: EntryTypeOption[] = Object.values(EntryType).map(
   })
 );
 
-const AddEntryForm = ({ onSubmit, error, diagnoses }: Props) => {
+interface HealthCheckRatingTypeOption {
+  label: string;
+  value: number;
+}
+
+const HealthCheckRatingOptions: HealthCheckRatingTypeOption[] = Object.keys(
+  HealthCheckRating
+)
+  .filter((x) => isNaN(parseInt(x)))
+  .map((e, i) => ({
+    label: e,
+    value: i,
+  }));
+
+const AddEntryForm = ({ onSubmit, error, diagnoses, onCancel }: Props) => {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -60,6 +81,10 @@ const AddEntryForm = ({ onSubmit, error, diagnoses }: Props) => {
       target: { value },
     } = event;
     setDiagnosisCodes(typeof value === "string" ? value.split(",") : value);
+  };
+
+  const handleHealthCheckRatingChange = (event: SelectChangeEvent<number>) => {
+    setHealthCheckRating(Number(event.target.value));
   };
 
   const addEntry = (event: SyntheticEvent) => {
@@ -102,10 +127,6 @@ const AddEntryForm = ({ onSubmit, error, diagnoses }: Props) => {
         break;
     }
   };
-
-  useEffect(() => {
-    console.log(diagnosisCodes);
-  }, [diagnosisCodes]);
 
   return (
     <div>
@@ -165,14 +186,17 @@ const AddEntryForm = ({ onSubmit, error, diagnoses }: Props) => {
             <InputLabel style={{ marginTop: 20 }}>
               Health Check Rating
             </InputLabel>
-            <TextField
-              type="number"
+            <Select
               fullWidth
               value={healthCheckRating}
-              onChange={({ target }) =>
-                setHealthCheckRating(Number(target.value))
-              }
-            />
+              onChange={handleHealthCheckRatingChange}
+            >
+              {HealthCheckRatingOptions.map((r) => (
+                <MenuItem key={r.label} value={r.value}>
+                  {r.label}
+                </MenuItem>
+              ))}
+            </Select>
           </>
         )}
 
@@ -221,9 +245,30 @@ const AddEntryForm = ({ onSubmit, error, diagnoses }: Props) => {
           </>
         )}
 
-        <Button type="submit" variant="contained">
-          Add
-        </Button>
+        <Grid>
+          <Grid item>
+            <Button
+              color="secondary"
+              variant="contained"
+              style={{ float: "left" }}
+              type="button"
+              onClick={onCancel}
+            >
+              Cancel
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              style={{
+                float: "right",
+              }}
+              type="submit"
+              variant="contained"
+            >
+              Add
+            </Button>
+          </Grid>
+        </Grid>
       </form>
     </div>
   );
