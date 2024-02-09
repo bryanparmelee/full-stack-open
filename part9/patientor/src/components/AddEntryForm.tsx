@@ -65,21 +65,7 @@ const AddEntryForm = ({ onSubmit, error, diagnoses }: Props) => {
   const addEntry = (event: SyntheticEvent) => {
     event.preventDefault();
 
-    const newEntry =
-      // diagnosisCodes.length > 0
-      //   ? {
-      //       description,
-      //       date,
-      //       specialist,
-      //       diagnosisCodes,
-      //     }
-      //   : {
-      //       description,
-      //       date,
-      //       specialist,
-      //     };
-
-      { description, date, specialist, diagnosisCodes };
+    const newEntry = { description, date, specialist, diagnosisCodes };
 
     switch (type) {
       case "HealthCheck":
@@ -174,15 +160,20 @@ const AddEntryForm = ({ onSubmit, error, diagnoses }: Props) => {
         </Select>
 
         {type === "HealthCheck" && (
-          <TextField
-            type="number"
-            label="Health Check Rating"
-            fullWidth
-            value={healthCheckRating}
-            onChange={({ target }) =>
-              setHealthCheckRating(Number(target.value))
-            }
-          />
+          <>
+            {" "}
+            <InputLabel style={{ marginTop: 20 }}>
+              Health Check Rating
+            </InputLabel>
+            <TextField
+              type="number"
+              fullWidth
+              value={healthCheckRating}
+              onChange={({ target }) =>
+                setHealthCheckRating(Number(target.value))
+              }
+            />
+          </>
         )}
 
         {type === "OccupationalHealthcare" && (

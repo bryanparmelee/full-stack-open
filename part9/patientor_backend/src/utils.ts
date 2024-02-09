@@ -61,21 +61,6 @@ const parseOccupation = (occupation: unknown): string => {
   return occupation;
 };
 
-// const entryTypes = ["Hospital", "OccupationalHealthcare", "HealthCheck"];
-
-// const parseEntries = (entries: unknown): Entry[] => {
-//   if (!entries || !Array.isArray(entries)) {
-//     throw new Error("Missing entries");
-//   }
-//   if (entries.length === 0) {
-//     return [] as Entry[];
-//   }
-//   if (!entries.every((entry) => entryTypes.includes(`${entry.type}`))) {
-//     throw new Error("Incomplete entries");
-//   }
-//   return entries as Entry[];
-// };
-
 export const toNewPatientEntry = (object: unknown): NewPatientEntry => {
   if (!object || typeof object !== "object") {
     throw new Error("Incorrect or missing data");
